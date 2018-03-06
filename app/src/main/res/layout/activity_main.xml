@@ -6,8 +6,40 @@
     android:layout_height="match_parent"
     android:gravity="center_horizontal"
     android:orientation="vertical"
-    android:paddingTop="40dp"
     tools:context="fi.qvik.android_mmo.MainActivity">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/high_score_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="right"
+            android:layout_marginBottom="16dp"
+            android:onClick="onHighScoreClick"
+            android:text="High score" />
+
+        <EditText
+            android:id="@+id/user_name_edit"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:hint="Username" />
+
+        <Button
+            android:id="@+id/login_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="right"
+            android:layout_marginBottom="16dp"
+            android:onClick="onLoginClick"
+            android:text="Login" />
+
+    </LinearLayout>
 
     <TextView
         android:id="@+id/score_text"
@@ -15,6 +47,15 @@
         android:layout_height="wrap_content"
         android:layout_marginBottom="16dp"
         android:text="@string/score" />
+
+    <TextView
+        android:id="@+id/error_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Error message"
+        android:textColor="#ff0000"
+        android:visibility="invisible"
+        tools:visibility="visible" />
 
     <Button
         android:id="@+id/button"
