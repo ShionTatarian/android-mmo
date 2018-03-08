@@ -14,6 +14,7 @@ public class AppUtils {
 
     private static final String TAG = "AppUtils";
 
+    private final String USER_NAME_KEY = "user_name";
     private static AppUtils instance;
     private Context context;
     private SharedPreferences preferences;
@@ -189,4 +190,11 @@ public class AppUtils {
         editor.apply();
     }
 
+    public void setUserName(String userName) {
+        storeString(USER_NAME_KEY, userName);
+    }
+
+    public String getUserName() {
+        return loadString(USER_NAME_KEY, null);
+    }
 }

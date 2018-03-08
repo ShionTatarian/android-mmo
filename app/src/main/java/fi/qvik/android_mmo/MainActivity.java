@@ -40,24 +40,18 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
+import fi.qvik.android_mmo.FirebaseHelper.FirebaseLoginListener;
+import fi.qvik.android_mmo.FirebaseHelper.FirebaseScoreListener;
+
 public class MainActivity extends AppCompatActivity {
 
     private final String TAG = getClass().getSimpleName();
-    private final String MY_FIREBASE = "https://android-mmo.firebaseio.com/";
-    private final String FIREBASE_SCORE = "https://android-mmo.firebaseio.com/score";
-    private final String FIREBASE_PLAYERS = "https://android-mmo.firebaseio.com/players";
-    private final String USER_NAME_KEY = "user_name";
-    private FirebaseDatabase database;
-    private DatabaseReference scoreRef;
 
     private TextView scoreText;
     private TextView errorText;
     private Button button;
     private Button loginButton;
     private EditText userNameEdit;
-
-    private FirebaseAuth mAuth;
-    private FirebaseUser currentUser;
 
     private AppUtils appUtils;
 
@@ -66,21 +60,17 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         appUtils = AppUtils.getInstance(this);
-        mAuth = FirebaseAuth.getInstance();
-
-        database = FirebaseDatabase.getInstance();
-        scoreRef = database.getReferenceFromUrl(FIREBASE_SCORE);
-        Log.d(TAG, "DB[" + database.getApp().getName() + "] open: " + scoreRef.toString());
-        addScoreListener();
 
         scoreText = findViewById(R.id.score_text);
         errorText = findViewById(R.id.error_text);
         button = findViewById(R.id.button);
         loginButton = findViewById(R.id.login_button);
         userNameEdit = findViewById(R.id.user_name_edit);
-        String userName = appUtils.loadString(USER_NAME_KEY, "");
+        String userName = appUtils.getUserName();
         userNameEdit.setText(userName);
-
+        if (!TextUtils.isEmpty(userName)) {
+            userNameEdit.setSelection(userName.length()); // set write cursor position to end
+        }
         userNameEdit.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
@@ -91,8 +81,7 @@ public class MainActivity extends AppCompatActivity {
             public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
                 if (!TextUtils.isEmpty(charSequence)) {
                     errorText.setVisibility(View.INVISIBLE);
-
-                    appUtils.storeString(USER_NAME_KEY, charSequence.toString());
+                    appUtils.setUserName(charSequence.toString());
                 }
             }
 
@@ -102,80 +91,39 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        updateScore(0);
-    }
-
-    public void onStart() {
-        super.onStart();
-        // Check if user is signed in (non-null) and update UI accordingly.
-        currentUser = mAuth.getCurrentUser();
-        if (currentUser == null) {
-            onLoginClick(null);
-        }
-        updateContent();
+        updateScore("?");
+        FirebaseHelper.getInstance(this).addScoreListener(scoreListener);
+        FirebaseHelper.getInstance(this).login(loginListener);
     }
 
     private void updateContent() {
-        loginButton.setVisibility(currentUser != null ? View.GONE : View.VISIBLE);
-        button.setVisibility(currentUser != null ? View.VISIBLE : View.GONE);
+        FirebaseUser user = FirebaseHelper.getInstance(this).getUser();
+
+        loginButton.setVisibility(user != null ? View.GONE : View.VISIBLE);
+        button.setVisibility(user != null ? View.VISIBLE : View.GONE);
     }
 
-    private void addScoreListener() {
-        scoreRef.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                // This method is called once with the initial value and again
-                // whenever data at this location is updated.
-                Object storedValue = dataSnapshot.getValue();
-                if (storedValue != null) {
-                    final long count = (long) storedValue;
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            updateScore(count);
-                        }
-                    });
-                    logDataSnapshot(dataSnapshot);
-                }
-            }
-
-            @Override
-            public void onCancelled(DatabaseError error) {
-                // Failed to read value
-                Log.w(TAG, "Failed to read value.", error.toException());
-            }
-        });
-    }
-
-    private void logDataSnapshot(DataSnapshot dataSnapshot) {
-        Object storedValue = dataSnapshot.getValue();
-        if (storedValue instanceof Map) {
-            HashMap<String, Object> map = (HashMap<String, Object>) storedValue;
-            Log.i(TAG, "Firebase Database:");
-            printMap(0, map);
-        } else {
-            Log.d(TAG, String.format("%s: %s [%s]", dataSnapshot.getKey(), storedValue, storedValue.getClass().getSimpleName()));
+    private FirebaseLoginListener loginListener = new FirebaseLoginListener() {
+        @Override
+        public void onLoginSuccess() {
+            updateContent();
         }
-    }
 
-    private void printMap(int depth, Map<String, Object> map) {
-        for (String key : map.keySet()) {
-            Object value = map.get(key);
-            if (value instanceof Map) {
-                Log.i(TAG, "KEY: " + key);
-                printMap(depth + 1, (HashMap<String, Object>) value);
-            } else {
-                StringBuilder indent = new StringBuilder();
-                for (int i = 0; i < depth; i++) {
-                    indent.append("\t");
-                }
-                Log.d(TAG, String.format("%s%s: %s [%s]", indent.toString(), key, value, value.getClass().getSimpleName()));
-            }
+        @Override
+        public void onLoginError() {
+            // TODO: show error?
         }
-    }
+    };
 
-    private void updateScore(long count) {
-        scoreText.setText(getString(R.string.score, count));
+    private FirebaseScoreListener scoreListener = new FirebaseScoreListener() {
+        @Override
+        public void onScoreChange(long score) {
+            updateScore(getString(R.string.score, score));
+        }
+    };
+
+    private void updateScore(String score) {
+        scoreText.setText(score);
     }
 
     public void onButtonClick(View view) {
@@ -186,77 +134,17 @@ public class MainActivity extends AppCompatActivity {
             return;
         }
 
-        DatabaseReference scoreRef = database.getReferenceFromUrl(FIREBASE_SCORE);
-        scoreRef.runTransaction(new Handler() {
-            @Override
-            public Result doTransaction(MutableData mutableData) {
-                Integer v = mutableData.getValue(Integer.class);
-                if (v == null) {
-                    Log.d(TAG, "doTransaction v[null]");
-                    mutableData.setValue(1);
-                    return Transaction.success(mutableData);
-                }
-                Log.d(TAG, "doTransaction oldV[" + v + "]");
-
-                mutableData.setValue(v + 1);
-                Log.d(TAG, "doTransaction newV[" + mutableData.getValue() + "]");
-                return Transaction.success(mutableData);
-            }
-
-            @Override
-            public void onComplete(DatabaseError databaseError, boolean b, DataSnapshot dataSnapshot) {
-                Log.d(TAG, "postTransaction:onComplete:" + databaseError);
-            }
-        });
-
-        DatabaseReference myScoreRef = database.getReferenceFromUrl(FIREBASE_PLAYERS + "/" + userName);
-        myScoreRef.runTransaction(new Handler() {
-            @Override
-            public Result doTransaction(MutableData mutableData) {
-                Integer v = mutableData.getValue(Integer.class);
-                if (v == null) {
-                    Log.d(TAG, "doTransaction v[null]");
-                    mutableData.setValue(1);
-                    return Transaction.success(mutableData);
-                }
-                Log.d(TAG, "doTransaction oldV[" + v + "]");
-
-                mutableData.setValue(v + 1);
-                Log.d(TAG, "doTransaction newV[" + mutableData.getValue() + "]");
-                return Transaction.success(mutableData);
-            }
-
-            @Override
-            public void onComplete(DatabaseError databaseError, boolean b, DataSnapshot dataSnapshot) {
-                Log.d(TAG, "postTransaction:onComplete:" + databaseError);
-            }
-        });
+        FirebaseHelper.getInstance(this).onScoreClick();
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        FirebaseHelper.getInstance(this).removeScoreListener(scoreListener);
     }
 
     public void onLoginClick(View view) {
-        mAuth.signInAnonymously()
-                .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
-                    @Override
-                    public void onComplete(@NonNull Task<AuthResult> task) {
-                        if (task.isSuccessful()) {
-                            // Sign in success, update UI with the signed-in user's information
-                            Log.d(TAG, "signInAnonymously:success");
-                            currentUser = mAuth.getCurrentUser();
-                        } else {
-                            // If sign in fails, display a message to the user.
-                            Log.w(TAG, "signInAnonymously:failure", task.getException());
-                            Toast.makeText(MainActivity.this, "Authentication failed.",
-                                    Toast.LENGTH_SHORT).show();
-                        }
-
-                        updateContent();
-                    }
-                });
+        FirebaseHelper.getInstance(this).login(loginListener);
     }
 
     public void onHighScoreClick(View view) {

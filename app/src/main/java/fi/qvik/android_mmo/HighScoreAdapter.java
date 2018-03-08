@@ -46,6 +46,10 @@ public class HighScoreAdapter extends RecyclerView.Adapter<HighScoreVH> {
         list.add(new Pair<>(player, score));
     }
 
+    public void addPlayerScore(Pair<String, Long> pair) {
+        list.add(pair);
+    }
+
     public void clear() {
         list.clear();
     }
