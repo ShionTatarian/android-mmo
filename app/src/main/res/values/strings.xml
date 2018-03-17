@@ -1,6 +1,8 @@
 <resources>
-    <string name="app_name">Android-mmo</string>
+    <string name="app_name">Töki Harroldia</string>
 
     <string name="score">Total Pokes: %d</string>
+
+    <string name="myscore">My Pokes: %d</string>
 
 </resources>

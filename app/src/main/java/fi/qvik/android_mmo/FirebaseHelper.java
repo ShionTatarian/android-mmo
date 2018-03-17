@@ -51,6 +51,7 @@ public class FirebaseHelper {
     private Query playersRef;
 
     private Set<FirebaseScoreListener> scoreListeners = new HashSet<>();
+    private Set<FirebaseScoreListener> myScoreListeners = new HashSet<>();
     private Set<FirebaseHighScoreListener> highScoreListeners = new HashSet<>();
 
     /**
@@ -170,6 +171,17 @@ public class FirebaseHelper {
         scoreRef.addValueEventListener(firebaseScoreListener);
     }
 
+    public void addMyScoreListener(FirebaseScoreListener listener) {
+        String userName = AppUtils.getInstance(context).getUserName();
+        if (TextUtils.isEmpty(userName)) {
+            return;
+        }
+        DatabaseReference myScoreRef = database.getReferenceFromUrl(FIREBASE_PLAYERS + "/" + userName);
+        myScoreListeners.add(listener);
+        myScoreRef.addValueEventListener(firebaseMyScoreListener);
+    }
+
+
     public void removeScoreListener(FirebaseScoreListener listener) {
         scoreListeners.remove(listener);
         if (scoreListeners.isEmpty()) {
@@ -198,6 +210,29 @@ public class FirebaseHelper {
             Log.w(TAG, "Failed to read value.", error.toException());
         }
     };
+
+    private ValueEventListener firebaseMyScoreListener = new ValueEventListener() {
+        @Override
+        public void onDataChange(DataSnapshot dataSnapshot) {
+            // This method is called once with the initial value and again
+            // whenever data at this location is updated.
+            Object storedValue = dataSnapshot.getValue();
+            if (storedValue != null) {
+                final long score = (long) storedValue;
+
+                for (FirebaseScoreListener listener : myScoreListeners) {
+                    listener.onScoreChange(score);
+                }
+            }
+        }
+
+        @Override
+        public void onCancelled(DatabaseError error) {
+            // Failed to read value
+            Log.w(TAG, "Failed to read value.", error.toException());
+        }
+    };
+
 
     private void logDataSnapshot(DataSnapshot dataSnapshot) {
         Object storedValue = dataSnapshot.getValue();
