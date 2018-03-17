@@ -1,0 +1,42 @@
+{
+  "project_info": {
+    "project_number": "72923920676",
+    "firebase_url": "https://android-mmo.firebaseio.com",
+    "project_id": "android-mmo",
+    "storage_bucket": "android-mmo.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:72923920676:android:1eb794158fdc467f",
+        "android_client_info": {
+          "package_name": "fi.qvik.android.mmo"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "72923920676-q5qofh8m7c2sio434n0gjm0d749cni58.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDfoMLg7_q507bpP2z8tZWNpysEZdU1_Mw"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
