@@ -4,6 +4,8 @@ import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.Signature;
+import android.graphics.Color;
+import android.support.annotation.ColorInt;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -66,6 +68,7 @@ public class MainActivity extends AppCompatActivity {
         button = findViewById(R.id.button);
         loginButton = findViewById(R.id.login_button);
         userNameEdit = findViewById(R.id.user_name_edit);
+
         String userName = appUtils.getUserName();
         userNameEdit.setText(userName);
         if (!TextUtils.isEmpty(userName)) {
@@ -151,4 +154,10 @@ public class MainActivity extends AppCompatActivity {
         Intent intent = new Intent(this, HighScoreActivity.class);
         startActivity(intent);
     }
+
+    public void onIQuitClick(View view) {
+        finish();
+
+    }
+
 }

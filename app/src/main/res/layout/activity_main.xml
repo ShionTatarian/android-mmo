@@ -64,4 +64,12 @@
         android:onClick="onButtonClick"
         android:text="Button" />
 
+    <Button
+        android:id="@+id/quit_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="iQuit"
+        android:onClick="onIQuitClick"
+        />
+
 </LinearLayout>
