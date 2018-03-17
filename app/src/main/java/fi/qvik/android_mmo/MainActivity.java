@@ -50,6 +50,7 @@ public class MainActivity extends AppCompatActivity {
     private final String TAG = getClass().getSimpleName();
 
     private TextView scoreText;
+    private TextView myscoreText;
     private TextView errorText;
     private Button button;
     private Button loginButton;
@@ -63,6 +64,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         appUtils = AppUtils.getInstance(this);
 
+        myscoreText = findViewById(R.id.myscore_text);
         scoreText = findViewById(R.id.score_text);
         errorText = findViewById(R.id.error_text);
         button = findViewById(R.id.button);
@@ -96,6 +98,7 @@ public class MainActivity extends AppCompatActivity {
 
         updateScore("?");
         FirebaseHelper.getInstance(this).addScoreListener(scoreListener);
+        FirebaseHelper.getInstance(this).addMyScoreListener(myScoreListener);
         FirebaseHelper.getInstance(this).login(loginListener);
     }
 
@@ -122,6 +125,13 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public void onScoreChange(long score) {
             updateScore(getString(R.string.score, score));
+        }
+    };
+
+    private FirebaseScoreListener myScoreListener = new FirebaseScoreListener() {
+        @Override
+        public void onScoreChange(long score) {
+            myscoreText.setText(getString(R.string.myscore, score));
         }
     };
 
