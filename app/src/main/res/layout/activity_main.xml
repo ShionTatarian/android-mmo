@@ -53,7 +53,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Error message"
-        android:textColor="#ff0000"
+        android:textColor="#e60000"
         android:visibility="invisible"
         tools:visibility="visible" />
 
@@ -65,12 +65,21 @@
         android:onClick="onButtonClick"
         android:text="Button" />
 
-    <Button
-        android:id="@+id/quit_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="iQuit"
-        android:onClick="onIQuitClick"
-        />
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+        <Button
+            android:id="@+id/quit_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Quit"
+            android:onClick="onIQuitClick"
+            android:layout_alignParentBottom="true"
+            android:layout_centerInParent="true"
+            />
+    </RelativeLayout>
+
+
 
 </LinearLayout>
+
