@@ -1,6 +1,7 @@
 package fi.qvik.android_mmo;
 
 import android.content.Intent;
+import android.media.MediaPlayer;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.Signature;
@@ -55,6 +56,7 @@ public class MainActivity extends AppCompatActivity {
     private ImageButton button;
     private Button loginButton;
     private EditText userNameEdit;
+    private MediaPlayer mp;
 
     private AppUtils appUtils;
 
@@ -62,6 +64,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        mp = MediaPlayer.create(this, R.raw.fx);
         appUtils = AppUtils.getInstance(this);
 
         scoreText = findViewById(R.id.score_text);
@@ -139,6 +142,8 @@ public class MainActivity extends AppCompatActivity {
         }
 
         FirebaseHelper.getInstance(this).onScoreClick();
+        mp.start();
+
     }
 
     @Override
