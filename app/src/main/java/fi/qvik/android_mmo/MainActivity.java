@@ -17,6 +17,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -52,7 +53,7 @@ public class MainActivity extends AppCompatActivity {
     private TextView scoreText;
     private TextView myscoreText;
     private TextView errorText;
-    private Button button;
+    private ImageButton button;
     private Button loginButton;
     private EditText userNameEdit;
 
