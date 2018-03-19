@@ -65,7 +65,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        mp = MediaPlayer.create(this, R.raw.fx);
+        mp = MediaPlayer.create(this, R.raw.oldman);
         appUtils = AppUtils.getInstance(this);
 
         myscoreText = findViewById(R.id.myscore_text);
